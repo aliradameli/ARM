@@ -28,7 +28,22 @@ module ARM_FPGA_wrapper (
         .probe3(ARM_inst.EXE_pc),           // input wire [31:0] probe3
         .probe4(ARM_inst.MEM_pc),           // input wire [31:0] probe4
         .probe5(ARM_inst.WB_pc),            // input wire [31:0] probe5
-        .probe6(ARM_inst.ID_instruction)    // input wire [31:0] probe6
+        .probe6(ARM_inst.ID_instruction),   // input wire [31:0] probe6
+        .probe7(ARM_inst.id_B),                 // [0:0]
+        .probe8(ARM_inst.id_S),                 // [0:0]
+        .probe9(ARM_inst.id_imm),               // [0:0]
+        .probe10(ARM_inst.id_WB_EN),            // [0:0]
+        .probe11(ARM_inst.id_Two_src),          // [0:0]
+        .probe12(ARM_inst.id_MEM_W_EN),         // [0:0]
+        .probe13(ARM_inst.id_MEM_R_EN),         // [0:0]
+        .probe14(ARM_inst.id_Dest),             // [3:0]
+        .probe15(ARM_inst.id_EXE_CMD),          // [3:0]
+        .probe16(ARM_inst.id_src_1),            // [3:0]
+        .probe17(ARM_inst.id_src_2),            // [3:0]
+        .probe18(ARM_inst.id_Shift_operand),    // [11:0]
+        .probe19(ARM_inst.id_Signed_imm_24),    // [23:0]
+        .probe20(ARM_inst.id_Val_Rn),           // [31:0]
+        .probe21(ARM_inst.id_Val_Rm)            // [31:0]
     );
 
 endmodule
