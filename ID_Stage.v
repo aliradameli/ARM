@@ -50,7 +50,7 @@ module ID_Stage (
     wire [3:0] cu_EXE_CMD;
     wire       cu_MEM_R_EN, cu_MEM_W_EN, cu_WB_EN, cu_B, cu_S;
 
-    Control_Unit u_Control_Unit (
+    ControlUnit u_Control_Unit (
         .Mode(mode),
         .Opcode(opcode),
         .S(S_bit),
