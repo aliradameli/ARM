@@ -28,7 +28,7 @@ module ControlUnit (
 
     // EXE_CMD (ALU commands)
     localparam EXE_MOV = 4'b0001, EXE_MVN = 4'b1001, EXE_ADD = 4'b0010,
-               EXE_ADC = 4'b0011, 8EXE_SUB = 4'b0100, EXE_SBC = 4'b0101,
+               EXE_ADC = 4'b0011, EXE_SUB = 4'b0100, EXE_SBC = 4'b0101,
                EXE_AND = 4'b0110, EXE_ORR = 4'b0111, EXE_EOR = 4'b1000;
 
     reg       wb_en, mem_r, mem_w, b, s_o;

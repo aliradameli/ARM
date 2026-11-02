@@ -101,5 +101,3 @@ module ID_Stage (
         kill ? 9'd0 : {cu_WB_EN, cu_MEM_R_EN, cu_MEM_W_EN, cu_EXE_CMD, cu_B, cu_S};
 
 endmodule
-
-
