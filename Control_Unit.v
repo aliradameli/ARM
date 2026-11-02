@@ -8,8 +8,6 @@ module ControlUnit (
     input  [3:0] Opcode,
     input  [1:0] Mode,
     output [8:0] CtrlOut,
-    output       uncond_MEM_R_EN,
-    output       uncond_MEM_W_EN,
     output       WB_EN,
     output       MEM_R_EN,
     output       MEM_W_EN,
