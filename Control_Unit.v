@@ -73,8 +73,6 @@ module ControlUnit (
         endcase
     end
 
-    assign uncond_MEM_R_EN = mem_r;
-    assign uncond_MEM_W_EN = mem_w;
 
     assign WB_EN    = wb_en;
     assign MEM_R_EN = mem_r;
@@ -84,3 +82,4 @@ module ControlUnit (
     assign S_OUT    = s_o;
 
 endmodule
+
