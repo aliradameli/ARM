@@ -5,12 +5,16 @@ module ID_Stage (
     input         rst,
     input  [31:0] PC_in,
     input  [31:0] Instruction,
-    // from later stages / units (not implemented yet in this session)
+    
+    // from later stages / units
     input         Hazard,
     input  [3:0]  SR,
-    input  [3:0]  WB_Dest,
-    input  [31:0] WB_Value,
-    input         WB_WB_EN,
+    
+    // RENAMED PORTS: match exactly what ARM.v uses for instantiation
+    input  [3:0]  Dest_WB,       
+    input  [31:0] Result_WB,     
+    input         writeBackEN,   
+    
     // outputs
     output [31:0] PC,
     output        WB_EN,
@@ -84,9 +88,9 @@ module ID_Stage (
         .rst(rst),
         .src_1(src_1),
         .src_2(src_2),
-        .Dest_WB(WB_Dest),
-        .Result_WB(WB_Value),
-        .writeBackEN(WB_WB_EN),
+        .Dest_WB(Dest_WB),          // Updated port name
+        .Result_WB(Result_WB),      // Updated port name
+        .writeBackEN(writeBackEN),  // Updated port name
         .reg_out_1(Val_Rn),
         .reg_out_2(Val_Rm)
     );

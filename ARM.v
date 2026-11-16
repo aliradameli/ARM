@@ -5,12 +5,10 @@ module ARM (
     input rst
 );
 
-    // Control inputs not implemented yet -> tied to 0
-    wire        freeze   = 1'b0;
-    wire        Hazard   = 1'b0;
-    wire [3:0]  WB_Dest  = 4'd0;
-    wire [31:0] WB_Value = 32'd0;
-    wire        WB_WB_EN = 1'b0;
+    // Hazard Detection wire
+    wire Hazard;
+    // When Hazard == 1, freeze PC and IF/ID reg
+    wire freeze = Hazard;
 
     // Branch and Flush wires driven from EXE stage
     wire        Branch_taken;
@@ -53,18 +51,37 @@ module ARM (
     (* keep = "true" *) wire [31:0] MEM_ALU_Res, MEM_Val_Rm;
     (* keep = "true" *) wire [3:0]  MEM_Dest;
 
-    // Remaining dummy stage wires
-    wire [31:0] MEM_pc = MEM_ALU_Res;
-    wire [31:0] mem_out_pc;
-    wire [31:0] WB_pc;
-    wire [31:0] wb_out_pc;
+    // MEM Stage outputs
+    wire [31:0] MEM_Data_out;
+
+    // MEM/WB register outputs
+    wire        WB_WB_EN;
+    wire        WB_MEM_R_EN;
+    wire [31:0] WB_ALU_Res;
+    wire [31:0] WB_Data;
+    wire [3:0]  WB_Dest;
+
+    // WB Stage Output (Loops back to ID Stage Register File)
+    wire [31:0] Result_WB;
 
     // Connect Branch & Flush from EXE stage
     assign Branch_taken = EXE_B;
     assign BranchAddr   = EXE_Br_addr;
     assign flush        = EXE_B;
 
-    // 1. IF Stage & IF/ID Pipeline Register
+    // ==================== Hazard Detection Unit ====================
+    HazardDetectionUnit u_HazardDetectionUnit (
+        .src1(id_src_1),
+        .src2(id_src_2),
+        .Two_src(id_Two_src),
+        .EXE_WB_EN(EXE_WB_EN),
+        .EXE_Dest(EXE_Dest),
+        .MEM_WB_EN(MEM_WB_EN),
+        .MEM_Dest(MEM_Dest),
+        .Hazard(Hazard)
+    );
+
+    // ==================== 1. IF STAGE ====================
     IF_Stage u_IF_Stage (
         .clk(clk),
         .rst(rst),
@@ -86,7 +103,7 @@ module ARM (
         .Instruction(ID_instruction)
     );
 
-    // 2. ID Stage & ID/EXE Pipeline Register
+    // ==================== 2. ID STAGE ====================
     ID_Stage u_ID_Stage (
         .clk(clk),
         .rst(rst),
@@ -94,9 +111,13 @@ module ARM (
         .Instruction(ID_instruction),
         .Hazard(Hazard),
         .SR(SR),
-        .WB_Dest(WB_Dest),
-        .WB_Value(WB_Value),
-        .WB_WB_EN(WB_WB_EN),
+        
+        // --- FIXED PORTS: Matching the exact names in ID_Stage.v ---
+        .Dest_WB(WB_Dest),
+        .Result_WB(Result_WB),
+        .writeBackEN(WB_WB_EN),
+        // -----------------------------------------------------------
+        
         .PC(id_out_pc),
         .WB_EN(id_WB_EN),
         .MEM_R_EN(id_MEM_R_EN),
@@ -118,13 +139,14 @@ module ARM (
     ID_Stage_Reg u_ID_Stage_Reg (
         .clk(clk),
         .rst(rst),
-        .PC_in(id_out_pc),
+        .flush(flush),
         .WB_EN_in(id_WB_EN),
         .MEM_R_EN_in(id_MEM_R_EN),
         .MEM_W_EN_in(id_MEM_W_EN),
         .EXE_CMD_in(id_EXE_CMD),
         .B_in(id_B),
         .S_in(id_S),
+        .PC_in(id_out_pc),
         .Val_Rn_in(id_Val_Rn),
         .Val_Rm_in(id_Val_Rm),
         .imm_in(id_imm),
@@ -146,7 +168,7 @@ module ARM (
         .Dest(EXE_Dest)
     );
 
-    // 3. EXE Stage, Status Register & EXE/MEM Pipeline Register
+    // ==================== 3. EXE STAGE ====================
     EXE_Stage u_EXE_Stage (
         .clk(clk),
         .rst(rst),
@@ -190,27 +212,38 @@ module ARM (
         .Dest(MEM_Dest)
     );
 
-    // 4. MEM Stage & MEM/WB Pipeline Register
+    // ==================== 4. MEM STAGE ====================
     MEM_Stage u_MEM_Stage (
         .clk(clk),
         .rst(rst),
-        .PC_in(MEM_pc),
-        .PC(mem_out_pc)
+        .MEM_R_EN(MEM_R_EN),
+        .MEM_W_EN(MEM_W_EN),
+        .ALU_res(MEM_ALU_Res),
+        .Val_Rm(MEM_Val_Rm),
+        .Data_out(MEM_Data_out)
     );
 
     MEM_Stage_Reg u_MEM_Stage_Reg (
         .clk(clk),
         .rst(rst),
-        .PC_in(mem_out_pc),
-        .PC(WB_pc)
+        .WB_EN_in(MEM_WB_EN),
+        .MEM_R_EN_in(MEM_R_EN),
+        .ALU_res_in(MEM_ALU_Res),
+        .Data_in(MEM_Data_out),
+        .Dest_in(MEM_Dest),
+        .WB_EN(WB_WB_EN),
+        .MEM_R_EN(WB_MEM_R_EN),
+        .ALU_res(WB_ALU_Res),
+        .Data(WB_Data),
+        .Dest(WB_Dest)
     );
 
-    // 5. WB Stage
+    // ==================== 5. WB STAGE ====================
     WB_Stage u_WB_Stage (
-        .clk(clk),
-        .rst(rst),
-        .PC_in(WB_pc),
-        .PC(wb_out_pc)
+        .MEM_R_EN(WB_MEM_R_EN),
+        .ALU_res(WB_ALU_Res),
+        .Data(WB_Data),
+        .Result_WB(Result_WB)
     );
 
 endmodule
