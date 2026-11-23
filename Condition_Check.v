@@ -8,9 +8,10 @@ module Condition_Check (
     output reg   cond_ok
 );
 
-    wire N = SR[3];
-    wire Z = SR[2];
-    wire C = SR[1];
+// Match ALU Status_Bits = {Z, c_out, N, v_out}
+    wire Z = SR[3];
+    wire C = SR[2];
+    wire N = SR[1];
     wire V = SR[0];
 
     always @(*) begin
