@@ -15,7 +15,12 @@ module RegisterFile (
     reg [31:0] reg_file [0:14];
     integer i;
 
-    
+    (* keep = "true" *) wire [31:0] R1 = reg_file[1];
+    (* keep = "true" *) wire [31:0] R2 = reg_file[2];
+    (* keep = "true" *) wire [31:0] R3 = reg_file[3];
+    (* keep = "true" *) wire [31:0] R4 = reg_file[4];
+    (* keep = "true" *) wire [31:0] R5 = reg_file[5];
+    (* keep = "true" *) wire [31:0] R6 = reg_file[6];
     always @(negedge clk or posedge rst) begin
         if (rst) begin
             for (i = 0; i < 15; i = i + 1) begin
